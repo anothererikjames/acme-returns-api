@@ -1,0 +1,6 @@
+{
+  "workspaceName": "Returns API",
+  "domain": "returns",
+  "collections": "postman/collections",
+  "environments": "postman/environments"
+}
