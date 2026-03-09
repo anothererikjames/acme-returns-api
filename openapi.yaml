@@ -1,0 +1,205 @@
+openapi: 3.0.3
+info:
+  title: Acme Returns API
+  version: 1.8.2
+  description: Full returns and refunds lifecycle for Acme commerce.
+  contact:
+    name: Commerce Engineering
+    email: returns-api@acme.com
+servers:
+  - url: https://api.acme.com/returns/v1
+    description: Production
+  - url: https://api-staging.acme.com/returns/v1
+    description: Staging
+  - url: https://api-dev.acme.com/returns/v1
+    description: Development
+security:
+  - bearerAuth: []
+tags:
+  - name: Returns
+  - name: Refunds
+  - name: RMA
+  - name: Labels
+  - name: Policies
+  - name: Tracking
+paths:
+  /health:
+    get:
+      tags: [Returns]
+      summary: Health check
+      operationId: healthCheck
+      security: []
+      responses:
+        '200': { description: Healthy }
+  /returns:
+    get:
+      tags: [Returns]
+      summary: List returns
+      operationId: listReturns
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [requested, approved, rejected, received, processed, completed] } }
+        - { name: orderId, in: query, schema: { type: string } }
+      responses:
+        '200': { description: Returns }
+    post:
+      tags: [Returns]
+      summary: Initiate return
+      operationId: createReturn
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '201': { description: Initiated }
+  /returns/{returnId}:
+    get:
+      tags: [Returns]
+      summary: Get return
+      operationId: getReturn
+      parameters:
+        - { name: returnId, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Return details }
+  /returns/{returnId}/approve:
+    post:
+      tags: [Returns]
+      summary: Approve return
+      operationId: approveReturn
+      parameters:
+        - { name: returnId, in: path, required: true, schema: { type: string } }
+      requestBody:
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '200': { description: Approved }
+  /returns/{returnId}/reject:
+    post:
+      tags: [Returns]
+      summary: Reject return
+      operationId: rejectReturn
+      parameters:
+        - { name: returnId, in: path, required: true, schema: { type: string } }
+      requestBody:
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '200': { description: Rejected }
+  /returns/{returnId}/receive:
+    post:
+      tags: [Returns]
+      summary: Mark items received
+      operationId: receiveReturn
+      parameters:
+        - { name: returnId, in: path, required: true, schema: { type: string } }
+      requestBody:
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '200': { description: Received }
+  /refunds:
+    get:
+      tags: [Refunds]
+      summary: List refunds
+      operationId: listRefunds
+      parameters:
+        - { name: status, in: query, schema: { type: string, enum: [pending, processing, completed, failed] } }
+      responses:
+        '200': { description: Refunds }
+  /refunds/{refundId}:
+    get:
+      tags: [Refunds]
+      summary: Get refund
+      operationId: getRefund
+      parameters:
+        - { name: refundId, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Refund details }
+  /rma:
+    get:
+      tags: [RMA]
+      summary: List RMAs
+      operationId: listRMAs
+      responses:
+        '200': { description: RMAs }
+    post:
+      tags: [RMA]
+      summary: Create RMA
+      operationId: createRMA
+      requestBody:
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '201': { description: Created }
+  /rma/{rmaId}:
+    get:
+      tags: [RMA]
+      summary: Get RMA
+      operationId: getRMA
+      parameters:
+        - { name: rmaId, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: RMA details }
+  /labels:
+    post:
+      tags: [Labels]
+      summary: Generate label
+      operationId: createLabel
+      requestBody:
+        content:
+          application/json:
+            schema: { type: object }
+      responses:
+        '201': { description: Label generated }
+  /labels/{labelId}:
+    get:
+      tags: [Labels]
+      summary: Get label
+      operationId: getLabel
+      parameters:
+        - { name: labelId, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Label }
+  /policies:
+    get:
+      tags: [Policies]
+      summary: List policies
+      operationId: listPolicies
+      responses:
+        '200': { description: Policies }
+  /policies/{policyId}:
+    get:
+      tags: [Policies]
+      summary: Get policy
+      operationId: getPolicy
+      parameters:
+        - { name: policyId, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Policy }
+  /tracking/{trackingNumber}:
+    get:
+      tags: [Tracking]
+      summary: Get tracking
+      operationId: getTracking
+      parameters:
+        - { name: trackingNumber, in: path, required: true, schema: { type: string } }
+      responses:
+        '200': { description: Tracking events }
+  /reasons:
+    get:
+      tags: [Returns]
+      summary: List return reasons
+      operationId: listReasons
+      security: []
+      responses:
+        '200': { description: Reasons }
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
