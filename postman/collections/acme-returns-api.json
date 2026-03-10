@@ -1,0 +1,267 @@
+{
+  "info": {
+    "name": "Acme Returns API",
+    "description": "Complete test suite for the Acme Returns API v1. Covers returns lifecycle, refunds, RMA, labels, policies, and tracking.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "{{baseUrl}}", "type": "string" },
+    { "key": "token", "value": "{{token}}", "type": "string" },
+    { "key": "returnId", "value": "", "type": "string" },
+    { "key": "refundId", "value": "", "type": "string" },
+    { "key": "rmaId", "value": "", "type": "string" },
+    { "key": "labelId", "value": "", "type": "string" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "GET /health",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Response time < 500ms', () => pm.expect(pm.response.responseTime).to.be.below(500));",
+                  "pm.test('Status is healthy', () => pm.expect(pm.response.json().status).to.eql('healthy'));",
+                  "pm.test('Version is v1.x.x', () => pm.expect(pm.response.json().version).to.match(/^1\\.\\d+\\.\\d+$/));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/health", "host": ["{{baseUrl}}"], "path": ["health"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Returns",
+      "item": [
+        {
+          "name": "GET /reasons",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has reasons array', () => pm.expect(pm.response.json().data).to.be.an('array'));",
+                  "pm.test('Each reason has code and label', () => {",
+                  "  pm.response.json().data.forEach(r => {",
+                  "    pm.expect(r).to.have.property('code');",
+                  "    pm.expect(r).to.have.property('label');",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": { "raw": "{{baseUrl}}/reasons", "host": ["{{baseUrl}}"], "path": ["reasons"] }
+          }
+        },
+        {
+          "name": "POST /returns",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Return has id', () => pm.expect(pm.response.json()).to.have.property('id'));",
+                  "pm.test('Status is requested', () => pm.expect(pm.response.json().status).to.eql('requested'));",
+                  "pm.test('Order ID matches', () => pm.expect(pm.response.json().orderId).to.eql('ord_test_123'));",
+                  "pm.collectionVariables.set('returnId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"orderId\": \"ord_test_123\", \"items\": [{\"orderItemId\": \"item_001\", \"quantity\": 1, \"reason\": \"damaged\", \"condition\": \"poor\"}], \"preferredRefundType\": \"original_payment\"}" },
+            "url": { "raw": "{{baseUrl}}/returns", "host": ["{{baseUrl}}"], "path": ["returns"] }
+          }
+        },
+        {
+          "name": "GET /returns/:id",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Return has required fields', () => {",
+                  "  const json = pm.response.json();",
+                  "  pm.expect(json).to.have.all.keys('id','orderId','customerId','items','status','createdAt','updatedAt');",
+                  "});",
+                  "pm.test('Items is array', () => pm.expect(pm.response.json().items).to.be.an('array'));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/returns/{{returnId}}", "host": ["{{baseUrl}}"], "path": ["returns", "{{returnId}}"] }
+          }
+        },
+        {
+          "name": "POST /returns/:id/approve",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Status is approved', () => pm.expect(pm.response.json().status).to.eql('approved'));",
+                  "pm.test('Refund type set', () => pm.expect(pm.response.json().refundType).to.be.oneOf(['full','partial','store_credit']));"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"refundType\": \"full\", \"notes\": \"Approved - item confirmed damaged\"}" },
+            "url": { "raw": "{{baseUrl}}/returns/{{returnId}}/approve", "host": ["{{baseUrl}}"], "path": ["returns", "{{returnId}}", "approve"] }
+          }
+        },
+        {
+          "name": "GET /returns - filter by status",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('All returns match status filter', () => {",
+                  "  pm.response.json().data.forEach(r => {",
+                  "    pm.expect(r.status).to.eql('approved');",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/returns?status=approved",
+              "host": ["{{baseUrl}}"], "path": ["returns"],
+              "query": [{ "key": "status", "value": "approved" }]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Labels",
+      "item": [
+        {
+          "name": "POST /labels",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 201', () => pm.response.to.have.status(201));",
+                  "pm.test('Label has tracking number', () => pm.expect(pm.response.json()).to.have.property('trackingNumber'));",
+                  "pm.test('Label has download URL', () => {",
+                  "  const url = pm.response.json().downloadUrl;",
+                  "  pm.expect(url).to.match(/^https:\\/\\//);",
+                  "});",
+                  "pm.collectionVariables.set('labelId', pm.response.json().id);"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{token}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "body": { "mode": "raw", "raw": "{\"returnId\": \"{{returnId}}\", \"carrier\": \"UPS\", \"serviceLevel\": \"ground\"}" },
+            "url": { "raw": "{{baseUrl}}/labels", "host": ["{{baseUrl}}"], "path": ["labels"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Policies",
+      "item": [
+        {
+          "name": "GET /policies",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has policies array', () => pm.expect(pm.response.json().data).to.be.an('array'));",
+                  "pm.test('Each policy has windowDays', () => {",
+                  "  pm.response.json().data.forEach(p => {",
+                  "    pm.expect(p.windowDays).to.be.a('number').and.to.be.above(0);",
+                  "  });",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/policies", "host": ["{{baseUrl}}"], "path": ["policies"] }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Refunds",
+      "item": [
+        {
+          "name": "GET /refunds",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                  "pm.test('Has data array', () => pm.expect(pm.response.json().data).to.be.an('array'));",
+                  "pm.test('No failed refunds pending > 24h', () => {",
+                  "  const failed = pm.response.json().data.filter(r => r.status === 'failed');",
+                  "  const oldFailed = failed.filter(r => {",
+                  "    const created = new Date(r.createdAt).getTime();",
+                  "    return (Date.now() - created) > 86400000;",
+                  "  });",
+                  "  pm.expect(oldFailed.length).to.eql(0);",
+                  "});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/refunds", "host": ["{{baseUrl}}"], "path": ["refunds"] }
+          }
+        }
+      ]
+    }
+  ]
+}
