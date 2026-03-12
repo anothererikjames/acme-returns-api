@@ -1,0 +1,10 @@
+$kind: http-request
+url: http://{{baseUrl}}/labels/:labelId
+method: GET
+pathVariables:
+  labelId: string
+body:
+  type: text
+  content: ""
+examples: ./.resources/Get label.resources/examples
+order: 1000

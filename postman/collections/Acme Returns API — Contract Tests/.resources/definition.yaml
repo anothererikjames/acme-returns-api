@@ -1,0 +1,15 @@
+$kind: collection
+description: |-
+  Full returns and refunds lifecycle for Acme commerce.
+
+  Contact Support:
+   Name: Commerce Engineering
+   Email: returns-api@acme.com
+variables:
+  baseUrl: https://api.acme.com/returns/v1
+auth:
+  - id: ""
+    type: bearer
+    name: bearer auth
+    credentials:
+      token: "{{bearerToken}}"

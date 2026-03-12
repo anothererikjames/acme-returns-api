@@ -1,0 +1,11 @@
+$kind: http-request
+url: http://{{baseUrl}}/returns?status=approved&orderId=string
+method: GET
+queryParams:
+  status: approved
+  orderId: string
+body:
+  type: text
+  content: ""
+examples: ./.resources/List returns.resources/examples
+order: 1000

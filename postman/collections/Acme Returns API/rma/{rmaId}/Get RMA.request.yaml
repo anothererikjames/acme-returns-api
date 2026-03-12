@@ -1,0 +1,10 @@
+$kind: http-request
+url: http://{{baseUrl}}/rma/:rmaId
+method: GET
+pathVariables:
+  rmaId: string
+body:
+  type: text
+  content: ""
+examples: ./.resources/Get RMA.resources/examples
+order: 1000

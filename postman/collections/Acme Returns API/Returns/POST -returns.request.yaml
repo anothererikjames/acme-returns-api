@@ -1,0 +1,28 @@
+$kind: http-request
+name: POST /returns
+url: "{{baseUrl}}/returns"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Content-Type: application/json
+body:
+  type: text
+  content: '{"orderId": "ord_test_123", "items": [{"orderItemId": "item_001",
+    "quantity": 1, "reason": "damaged", "condition": "poor"}],
+    "preferredRefundType": "original_payment"}'
+scripts:
+  - type: afterResponse
+    code: >-
+      pm.test('Status is 201', () => pm.response.to.have.status(201));
+
+      pm.test('Return has id', () =>
+      pm.expect(pm.response.json()).to.have.property('id'));
+
+      pm.test('Status is requested', () =>
+      pm.expect(pm.response.json().status).to.eql('requested'));
+
+      pm.test('Order ID matches', () =>
+      pm.expect(pm.response.json().orderId).to.eql('ord_test_123'));
+
+      pm.collectionVariables.set('returnId', pm.response.json().id);
+order: 2000

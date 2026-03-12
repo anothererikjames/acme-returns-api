@@ -1,0 +1,10 @@
+$kind: http-request
+url: http://{{baseUrl}}/returns
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: "{}"
+examples: ./.resources/Initiate return.resources/examples
+order: 2000

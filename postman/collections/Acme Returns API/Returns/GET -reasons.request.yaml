@@ -1,0 +1,19 @@
+$kind: http-request
+name: GET /reasons
+url: "{{baseUrl}}/reasons"
+method: GET
+scripts:
+  - type: afterResponse
+    code: >-
+      pm.test('Status is 200', () => pm.response.to.have.status(200));
+
+      pm.test('Has reasons array', () =>
+      pm.expect(pm.response.json().data).to.be.an('array'));
+
+      pm.test('Each reason has code and label', () => {
+        pm.response.json().data.forEach(r => {
+          pm.expect(r).to.have.property('code');
+          pm.expect(r).to.have.property('label');
+        });
+      });
+order: 1000

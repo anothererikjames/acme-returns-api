@@ -1,0 +1,10 @@
+$kind: http-request
+url: http://{{baseUrl}}/tracking/:trackingNumber
+method: GET
+pathVariables:
+  trackingNumber: string
+body:
+  type: text
+  content: ""
+examples: ./.resources/Get tracking.resources/examples
+order: 1000

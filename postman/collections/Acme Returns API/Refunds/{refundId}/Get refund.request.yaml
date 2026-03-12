@@ -1,0 +1,10 @@
+$kind: http-request
+url: http://{{baseUrl}}/refunds/:refundId
+method: GET
+pathVariables:
+  refundId: string
+body:
+  type: text
+  content: ""
+examples: ./.resources/Get refund.resources/examples
+order: 1000

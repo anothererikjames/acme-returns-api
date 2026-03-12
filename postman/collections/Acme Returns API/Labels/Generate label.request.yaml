@@ -1,0 +1,10 @@
+$kind: http-request
+url: http://{{baseUrl}}/labels
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: "{}"
+examples: ./.resources/Generate label.resources/examples
+order: 1000

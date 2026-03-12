@@ -1,0 +1,8 @@
+$kind: http-request
+url: http://{{baseUrl}}/reasons
+method: GET
+body:
+  type: text
+  content: ""
+examples: ./.resources/List return reasons.resources/examples
+order: 1000

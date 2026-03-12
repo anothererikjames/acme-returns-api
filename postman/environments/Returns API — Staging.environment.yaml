@@ -1,0 +1,12 @@
+name: Returns API — Staging
+values:
+  - key: baseUrl
+    value: https://api-staging.acme.com/returns/v1
+    enabled: true
+  - key: authToken
+    value: ""
+    enabled: true
+  - key: userId
+    value: usr_demo_001
+    enabled: true
+color: null

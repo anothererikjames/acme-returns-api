@@ -1,0 +1,21 @@
+$kind: http-request
+name: GET /preferences/:userId
+url: "{{baseUrl}}/preferences/{{userId}}"
+method: GET
+headers:
+  Authorization: Bearer {{authToken}}
+  Content-Type: application/json
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test("Status is 2xx", () => {
+        pm.expect(pm.response.code).to.be.oneOf([200, 201, 204]);
+      });
+      pm.test("Response time < 500ms", () => {
+        pm.expect(pm.response.responseTime).to.be.below(500);
+      });
+      pm.test("Response has valid JSON", () => {
+        pm.response.to.have.header("content-type");
+      });
+    language: text/javascript
+order: 6000

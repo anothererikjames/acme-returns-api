@@ -1,0 +1,17 @@
+$kind: http-request
+name: POST /returns/:id/approve
+url: "{{baseUrl}}/returns/{{returnId}}/approve"
+method: POST
+headers:
+  Authorization: Bearer {{token}}
+  Content-Type: application/json
+body:
+  type: text
+  content: '{"refundType": "full", "notes": "Approved - item confirmed damaged"}'
+scripts:
+  - type: afterResponse
+    code: |-
+      pm.test('Status is 200', () => pm.response.to.have.status(200));
+      pm.test('Status is approved', () => pm.expect(pm.response.json().status).to.eql('approved'));
+      pm.test('Refund type set', () => pm.expect(pm.response.json().refundType).to.be.oneOf(['full','partial','store_credit']));
+order: 4000

@@ -1,0 +1,10 @@
+$kind: http-request
+url: http://{{baseUrl}}/returns/:returnId
+method: GET
+pathVariables:
+  returnId: string
+body:
+  type: text
+  content: ""
+examples: ./.resources/Get return.resources/examples
+order: 1000

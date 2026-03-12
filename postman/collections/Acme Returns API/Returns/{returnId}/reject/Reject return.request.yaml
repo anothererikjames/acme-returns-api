@@ -1,0 +1,12 @@
+$kind: http-request
+url: http://{{baseUrl}}/returns/:returnId/reject
+method: POST
+headers:
+  Content-Type: application/json
+pathVariables:
+  returnId: string
+body:
+  type: json
+  content: "{}"
+examples: ./.resources/Reject return.resources/examples
+order: 1000

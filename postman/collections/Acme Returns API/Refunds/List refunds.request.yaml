@@ -1,0 +1,10 @@
+$kind: http-request
+url: http://{{baseUrl}}/refunds?status=failed
+method: GET
+queryParams:
+  status: failed
+body:
+  type: text
+  content: ""
+examples: ./.resources/List refunds.resources/examples
+order: 1000

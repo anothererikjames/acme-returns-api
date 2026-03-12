@@ -1,0 +1,12 @@
+$kind: http-request
+url: http://{{baseUrl}}/returns/:returnId/receive
+method: POST
+headers:
+  Content-Type: application/json
+pathVariables:
+  returnId: string
+body:
+  type: json
+  content: "{}"
+examples: ./.resources/Mark items received.resources/examples
+order: 1000

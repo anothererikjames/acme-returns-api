@@ -1,0 +1,10 @@
+$kind: http-request
+url: http://{{baseUrl}}/policies/:policyId
+method: GET
+pathVariables:
+  policyId: string
+body:
+  type: text
+  content: ""
+examples: ./.resources/Get policy.resources/examples
+order: 1000

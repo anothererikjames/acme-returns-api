@@ -1,0 +1,10 @@
+$kind: http-request
+url: http://{{baseUrl}}/rma
+method: POST
+headers:
+  Content-Type: application/json
+body:
+  type: json
+  content: "{}"
+examples: ./.resources/Create RMA.resources/examples
+order: 2000
