@@ -1,0 +1,25 @@
+{
+  "returns": [
+    {
+      "id": "ret_001",
+      "orderId": "ord_001",
+      "reason": "defective",
+      "status": "approved"
+    }
+  ],
+  "refunds": [
+    {
+      "id": "rfnd_001",
+      "returnId": "ret_001",
+      "amount": 49.99,
+      "method": "original_payment"
+    }
+  ],
+  "policies": [
+    {
+      "id": "pol_001",
+      "name": "Standard Return",
+      "windowDays": 30
+    }
+  ]
+}
